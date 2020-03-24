@@ -1,7 +1,9 @@
 #ifndef UDPHEADER_H
 #define UDPHEADER_H
+#include <winsock2.h>
+#include <windows.h>
 #include<iostream>
-#include<netinet/in.h>
+//#include<netinet/in.h>
 #include "utilityFunctions.h"
 #include "allTypeDefHeader.h"
 using namespace std;
@@ -28,6 +30,13 @@ struct udpHeader
 		printf("\nUDP header Destination Port Number : 0x%x", destinationPortNumber);
 		printf("\nUDP header Length : 0x%x", length);
 		printf("\nUDP header Checksum : 0x%x", checkSum);
+	}
+
+	void writePortNumberToCSVFile(fstream* fout)
+	{
+	    *fout<<ntohs(sourcePortNumber);
+	    *fout<<",";
+	    *fout<<ntohs(destinationPortNumber);
 	}
 
 	void displayUdpHeader()

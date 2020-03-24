@@ -1,8 +1,9 @@
 #ifndef IPV4HEADER_H
 #define IPV4HEADER_H
-
+#include <winsock2.h>
+#include <windows.h>
 #include<iostream>
-#include<netinet/in.h>
+//#include<netinet/in.h>
 #include "utilityFunctions.h"
 #include "allTypeDefHeader.h"
 
@@ -46,7 +47,7 @@ struct ipv4Header
    		cout<<"\nipV4 header Version : "<<((ipVersionNumberNdHeaderLength & 240)>>4);
    		//i4obj.ipHL = i4obj.ipVersionNumberNdHeaderLength & 15;
    		cout<<"\nipV4 header Length : "<<(ipVersionNumberNdHeaderLength & 15);
-   
+
    		cout<< "\nipV4 header Type of service : 0x" << displayInHex(TOS);
 
    		cout<<"\nipV4 header Total Length : 0x"<<displayInHex(totalLength);
@@ -65,7 +66,7 @@ struct ipv4Header
 	void displayIPV4Header()
 	{
 		cout<<"\nIpV4 Header in decimal *************************";
-		cout<< "ipV4 header Version and Header length : 0x" <<displayInHex(ipVersionNumberNdHeaderLength); 
+		cout<< "ipV4 header Version and Header length : 0x" <<displayInHex(ipVersionNumberNdHeaderLength);
 		cout<<"\nipV4 header Version in Decimal: "<<((ipVersionNumberNdHeaderLength & 240)>>4);
 		cout<<"\nipV4 header Length in Decimal: "<<(ipVersionNumberNdHeaderLength & 15);
 		cout<< "\nipV4 header Type of service in Decimal: " << ntohs(TOS);
@@ -80,6 +81,28 @@ struct ipv4Header
 		printIPAddress(ntohl(sourceAddress));
 		cout<<"\nipV4 header Destination Address in decimal : ";
 		printIPAddress(ntohl(destinationAddress));
+	}
+
+	void writeIPAddressToCSVFile(fstream* fout)
+	{
+	    char str[8];
+	    unsigned int ip = ntohl(sourceAddress);
+	    unsigned char bytes[4];
+        bytes[0] = ip & 0xFF;
+        bytes[1] = (ip >> 8) & 0xFF;
+        bytes[2] = (ip >> 16) & 0xFF;
+        bytes[3] = (ip >> 24) & 0xFF;
+        sprintf(str,"%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
+        *fout<<str;
+        *fout<<",";
+        ip = ntohl(destinationAddress);
+        bytes[0] = ip & 0xFF;
+        bytes[1] = (ip >> 8) & 0xFF;
+        bytes[2] = (ip >> 16) & 0xFF;
+        bytes[3] = (ip >> 24) & 0xFF;
+        sprintf(str,"%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
+        *fout<<str;
+
 	}
 };
 

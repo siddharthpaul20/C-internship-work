@@ -1,3 +1,4 @@
+
 #include<iostream>
 #include<fstream>
 #include "headerForAllStructs.h"
@@ -45,7 +46,7 @@ int main()
 	printf("\nhi\n");
 	// file is pcap file
 	// now reading packets int pcap file
-        //int counterForTesting = 3046;
+    //int counterForTesting = 3;
 	while(inFile.peek() != EOF)   // while end of file is not reached
 	//while(counterForTesting--)
 	{
@@ -59,9 +60,9 @@ int main()
 		readerPointer+=4;
    		inFile.read((char*) &pobj.captureLength,4);
 		readerPointer+=4;
-   		inFile.read((char*) &pobj.originalLength,4); 
+   		inFile.read((char*) &pobj.originalLength,4);
 		readerPointer+=4;
-   		
+
 		pobj.displayPacketHeaderInHexaDecimal();
 
 		pobj.displayPacketHeader();
@@ -79,7 +80,7 @@ int main()
 		readerPointer+=2;
 
 		eobj.displayEthernetHeaderInHexaDecimal();
-   		
+
 		eobj.displayEthernetHeader();
 
 		if(eobj.ethernetType==8)   // packet contains ipV4 header
@@ -100,16 +101,16 @@ int main()
    			inFile.read((char*) &i4obj.identification,2);
 			readerPointer+=2;
 
-   			
+
    			inFile.read((char*) &i4obj.flagsNdFragmentOffset,2);
 			readerPointer+=2;
-   
+
    			inFile.read((char*) &i4obj.TTL,1);
    			readerPointer+=1;
 
    			inFile.read((char*) &i4obj.protocol,1);
   			readerPointer+=1;
- 
+
    			inFile.read((char*) &i4obj.headerCheckSum,2);
 			readerPointer+=2;
 
@@ -120,7 +121,7 @@ int main()
 			readerPointer+=4;
 
 			i4obj.displayIPV4HeaderInHexaDecimal();
-   			
+
 			i4obj.displayIPV4Header();
 			//**************** IPV4 header read successfully **********************************
 
@@ -157,7 +158,7 @@ int main()
 				readerPointer+=2;
 
 				tcpHobj.displayTcpHeaderInHexaDecimal();
-				
+
 				tcpHobj.displayTcpHeader();
 			}
 			else
@@ -183,7 +184,7 @@ int main()
 					udpHobj.displayUdpHeader();
 				}
 			}
-			
+
 			// at last when tcp or udp header is read
 			unsigned int tempPacketLength = hexadecimalToDecimal(displayInHex(pobj.captureLength));
 			cout<<"\n-----------------> "<<tempPacketLength<<"\n";
@@ -197,8 +198,8 @@ int main()
 			inFile.seekg(skipPacketPointer+tempPacketLength,ios::beg);
 			readerPointer=skipPacketPointer+tempPacketLength;
 		}
-	}  // end of while	
-	      
+	}  // end of while
+
    }
    else  // file is not pcap type
    {

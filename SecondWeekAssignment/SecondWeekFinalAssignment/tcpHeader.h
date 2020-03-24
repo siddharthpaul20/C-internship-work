@@ -1,9 +1,10 @@
 #ifndef TCPHEADER_H
 #define TCPHEADER_H
-
+#include <winsock2.h>
+#include <windows.h>
 #include<iostream>
 #include "utilityFunctions.h"
-#include<netinet/in.h>
+//#include<netinet/in.h>
 #include "allTypeDefHeader.h"
 using namespace std;
 
@@ -57,6 +58,13 @@ struct tcpHeader
 		cout<<"\nTCP header Window size in decimal : "<<ntohs(windowSize);
 		cout<<"\nTCP header CheckSum in decimal : "<<ntohs(checkSum);
 		cout<<"\nTCP header Urgent Pointer in decimal : "<<ntohs(urgentPointer);
+	}
+
+	void writePortNumberToCSVFile(fstream* fout)
+	{
+	    *fout<<ntohs(sourcePortNumber);
+	    *fout<<",";
+	    *fout<<ntohs(destinationPortNumber);
 	}
 
 };
