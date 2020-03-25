@@ -5,6 +5,8 @@
 #include<cstdio>
 #include<string>
 #include <sstream>
+#include<winsock2.h>
+#include<windows.h>
 #include "allTypeDefHeader.h"
 #include "ipV6AddressHeader.h"
 
@@ -134,10 +136,16 @@ void printIPAddress(unsigned int ip)
     printf("%d.%d.%d.%d\n", bytes[3], bytes[2], bytes[1], bytes[0]);
 }
 
+void printIPAddress(unsigned char ip[])   // till not used this method anywhere
+{
+
+    printf("%d.%d.%d.%d\n", ip[0], ip[1], ip[2], ip[3]);
+}
+
 void printIPAddress(ipV6Address ip)
 {
 
-    printf("%x.%x.%x.%x.%x.%x.%x.%x\n", ip.ipV6[0], ip.ipV6[1], ip.ipV6[2], ip.ipV6[3], ip.ipV6[4], ip.ipV6[5], ip.ipV6[6], ip.ipV6[7]);
+    printf("%x.%x.%x.%x.%x.%x.%x.%x\n", ntohs(ip.ipV6[0]), ntohs(ip.ipV6[1]), ntohs(ip.ipV6[2]), ntohs(ip.ipV6[3]), ntohs(ip.ipV6[4]), ntohs(ip.ipV6[5]), ntohs(ip.ipV6[6]), ntohs(ip.ipV6[7]) );
 }
 
 void printMACAddress(unsigned char bytes[])

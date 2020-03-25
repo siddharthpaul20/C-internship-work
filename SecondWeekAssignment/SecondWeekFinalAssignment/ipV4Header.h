@@ -4,6 +4,7 @@
 #include <windows.h>
 #include<iostream>
 //#include<netinet/in.h>
+#include "ipV4AddressHeader.h"
 #include "utilityFunctions.h"
 #include "allTypeDefHeader.h"
 
@@ -23,8 +24,10 @@ struct ipv4Header
 	uint16 TTL;					// Time to Live, it is of size 8 bits
 	uint16 protocol;				// Protocol, it is of size 8 bits
 	uint16 headerCheckSum;			// HeaderChecksum, it is of size 16 bits
-	uint32 sourceAddress;			// SourceAddress, it is of size 32 bits
-	uint32 destinationAddress;			// DestinationAddress, it is of size  32 bits
+	//uint32 sourceAddress;			// SourceAddress, it is of size 32 bits
+	//uint32 destinationAddress;			// DestinationAddress, it is of size  32 bits
+	ipV4Address sourceAddress;
+	ipV4Address destinationAddress;
 
 	ipv4Header()
 	{
@@ -36,8 +39,8 @@ struct ipv4Header
 		TTL = 0;
 		protocol = 0;
 		headerCheckSum = 0;
-		sourceAddress = 0;
-		destinationAddress = 0;
+		//sourceAddress = 0;    No need to intialize this, as they are already intialized
+		//destinationAddress = 0;     No need to intialize this, as they are already intialized
 	}
 
 	void displayIPV4HeaderInHexaDecimal()
@@ -59,8 +62,8 @@ struct ipv4Header
    		cout<<"\nipV4 header TimeToLive : 0x"<<displayInHex(TTL);
    		cout<<"\nipV4 header Protocol : 0x"<<displayInHex(protocol);
    		cout<<"\nipV4 header HeaderCheckSum : 0x"<<displayInHex(headerCheckSum);
-   		cout<<"\nipV4 header Source Address : 0x"<<displayInHex(sourceAddress);
-   		cout<<"\nipV4 header Destination Address : 0x"<<displayInHex(destinationAddress);
+   		cout<<"\nipV4 header Source Address : 0x"<<displayInHex(sourceAddress.ipV4);
+   		cout<<"\nipV4 header Destination Address : 0x"<<displayInHex(destinationAddress.ipV4);
 	}
 
 	void displayIPV4Header()
@@ -78,15 +81,15 @@ struct ipv4Header
 		cout<<"\nipV4 header Protocol in decimal : "<<ntohs((protocol<<8));
 		cout<<"\nipV4 header HeaderCheckSum in decimal : "<<ntohs(headerCheckSum);
 		cout<<"\nipV4 header Source Address in decimal : ";
-		printIPAddress(ntohl(sourceAddress));
+		printIPAddress(ntohl(sourceAddress.ipV4));
 		cout<<"\nipV4 header Destination Address in decimal : ";
-		printIPAddress(ntohl(destinationAddress));
+		printIPAddress(ntohl(destinationAddress.ipV4));
 	}
 
 	void writeIPAddressToCSVFile(fstream* fout)
 	{
 	    char str[8];
-	    unsigned int ip = ntohl(sourceAddress);
+	    unsigned int ip = ntohl(sourceAddress.ipV4);
 	    unsigned char bytes[4];
         bytes[0] = ip & 0xFF;
         bytes[1] = (ip >> 8) & 0xFF;
@@ -95,7 +98,7 @@ struct ipv4Header
         sprintf(str,"%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
         *fout<<str;
         *fout<<",";
-        ip = ntohl(destinationAddress);
+        ip = ntohl(destinationAddress.ipV4);
         bytes[0] = ip & 0xFF;
         bytes[1] = (ip >> 8) & 0xFF;
         bytes[2] = (ip >> 16) & 0xFF;

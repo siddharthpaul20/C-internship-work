@@ -2,6 +2,7 @@
 #define PCAP_FILE_PARSER_H
 
 #include <fstream>
+#include <map>
 #include "headerForAllStructs.h"
 #include "pcapFile.h"
 #include "allTypeDefHeader.h"
@@ -14,9 +15,16 @@ class PcapFileParser
 
     char* generateCSVFileName(char fileName[]);
 
+    char* generateSecondCSVFileName(char fileName[]);
+
     void writePacketDetailsToCSVFile();
 
     void writeIPAddressCountToCSVFile();
+
+    void writeIPAddressToCSVFile(fstream* fout,ipV4Address ip);
+
+    void writeIPAddressToCSVFile(fstream* fout,ipV6Address ip);
+
 };
 
 PcapFile PcapFileParser:: parse(char fileName[])
@@ -62,6 +70,9 @@ PcapFile PcapFileParser:: parse(char fileName[])
             // file pointer
             fstream fout;
 
+            // creating a map of type <ipAddress,int> for storing ip address and their count
+            map <ipV4Address,int> mymap1;
+            map <ipV6Address,int> mymap2;
             // opens an existing csv file or creates a new file.
             fout.open(generateCSVFileName(fileName), ios::out | ios::app);
 
@@ -77,11 +88,11 @@ PcapFile PcapFileParser:: parse(char fileName[])
             fout<<"SourcePortNo.";
             fout<<",";
             fout<<"DestinationPortNo.";
-            //fout<<"\n";
+
 
             // file is pcap file
             // now reading packets int pcap file
-            //int counterForTesting = 1;
+            //int counterForTesting = 10;
             while(inFile.peek() != EOF)   // while end of file is not reached
             //while(counterForTesting--)
             {
@@ -162,6 +173,13 @@ PcapFile PcapFileParser:: parse(char fileName[])
 
                     inFile.read((char*) &i4obj.destinationAddress,4);
                     readerPointer+=4;
+
+                    // storing ipAdress and their count
+
+                    mymap1[i4obj.sourceAddress]++;
+                    mymap1[i4obj.destinationAddress]++;
+
+                    // end of storing ipAddress
 
                     i4obj.displayIPV4HeaderInHexaDecimal();
 
@@ -275,6 +293,13 @@ PcapFile PcapFileParser:: parse(char fileName[])
                         inFile.read((char*) &i6obj.destinationAddress,16);
                         readerPointer+=16;
 
+                        // storing ipAdress and their count
+
+                        mymap2[i6obj.sourceAddress]++;
+                        mymap2[i6obj.destinationAddress]++;
+
+                        // end of storing ipAddress
+
                         i6obj.displayIPV6HeaderInHexaDecimal();
 
                         i6obj.displayIPV6Header();
@@ -285,7 +310,7 @@ PcapFile PcapFileParser:: parse(char fileName[])
                         //**************** IPV4 header read successfully **********************************
 
                         // Now reading tcp header or udp header
-                        if(i6obj.nextHeaderNdHopLimit&255==6)
+                        if( (i6obj.nextHeaderNdHopLimit & 255)==6)
                         //if(hexadecimalToDecimal(displayInHex(i6obj.nextHeaderNdHopLimit))==6)
                         {
                             // Reading TCP Header
@@ -329,7 +354,7 @@ PcapFile PcapFileParser:: parse(char fileName[])
                         }
                         else
                         {
-                            if(i6obj.nextHeaderNdHopLimit&255==17)
+                            if( (i6obj.nextHeaderNdHopLimit & 255) ==17)
                             //if(hexadecimalToDecimal(displayInHex(i4obj.protocol))==17)
                             {
                                 // Reading UDP Header
@@ -377,6 +402,64 @@ PcapFile PcapFileParser:: parse(char fileName[])
                 }
             }  // end of while
 
+            // closing the file
+            fout.close();
+
+            //now opening second csv file
+
+            fout.open(generateSecondCSVFileName(fileName), ios::out | ios::app);
+
+            fout<<"Ip Address";
+            fout<<",";
+            fout<<"Packet Counts";
+
+            //Now writing ipV4 addressed to second csv file first
+
+            printf("\nMAP1 **************\n");
+            for (auto x : mymap1)
+                //cout << x.first.ip << " " << x.second << endl;
+                //printf("\n%d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d  -- %d",x.first.ip[0],x.first.ip[1],x.first.ip[2],x.first.ip[3],x.first.ip[4],x.first.ip[5],x.first.ip[6],x.first.ip[7],x.first.ip[8],x.first.ip[9],x.first.ip[10],x.first.ip[11],x.first.ip[12],x.first.ip[13],x.first.ip[14],x.first.ip[15],x.second);
+                {
+                    fout<<"\n";
+                    //x.first.writeIPAddressToCSVFile(&fout);
+                    writeIPAddressToCSVFile(&fout,x.first);
+                    fout<<x.second;
+                    printIPAddress(ntohl(x.first.ipV4));
+                    printf(" -- %d\n",x.second);
+                }
+            /*map<ipV4Address, int>::iterator itr;
+            for(itr=mymap1.begin();itr!=mymap1.end();itr++)
+            {
+                fout<<"\n";
+                ipV4Address* abc;
+                *abc =(itr->first);
+                abc->writeIPAddressToCSVFile(&fout);
+                fout<<",";
+                fout<<itr->second;
+            }*/
+            printf("\nMAP2 **************\n");
+            for(auto x: mymap2)
+            {
+                fout<<"\n";
+                //ipV6Address* abc;
+                //*abc = x.first;
+                //abc->writeIPAddressToCSVFile(&fout);
+                writeIPAddressToCSVFile(&fout,x.first);
+                fout<<x.second;
+                printIPAddress(x.first);
+                printf(" -- %d\n",x.second);
+            }
+            /*map<ipV6Address, int>::iterator it;
+            for(it=mymap2.begin();it!=mymap2.end();it++)
+            {
+                fout<<"\n";
+                ipV6Address* abc;
+                *abc =(it->first);
+                abc->writeIPAddressToCSVFile(&fout);
+                fout<<",";
+                fout<<it->second;
+            }*/
+
        }
        else  // file is not pcap type
        {
@@ -403,6 +486,50 @@ char* PcapFileParser :: generateCSVFileName(char fileName[])
     fileName[dotIndex+4] = '\0';
     //printf("\n%s 99999999\n",fileName);
     return fileName;
+}
+
+char* PcapFileParser :: generateSecondCSVFileName(char fileName[])
+{
+    char* pointerToDot;
+    pointerToDot = strchr(fileName,'.');
+    int dotIndex = (int) (pointerToDot - fileName);
+    fileName[dotIndex+0]= '2';
+    fileName[dotIndex+1] = '.';
+    fileName[dotIndex+2] = 'c';
+    fileName[dotIndex+3] = 's';
+    fileName[dotIndex+4] = 'v';
+    fileName[dotIndex+5] = '\0';
+    //printf("\n%s 99999999\n",fileName);
+    return fileName;
+}
+
+void PcapFileParser :: writeIPAddressToCSVFile(fstream *fout,ipV4Address ip)
+{
+     char str[8];
+     unsigned int temp = ntohl(ip.ipV4);
+     unsigned char bytes[4];
+     bytes[0] = temp & 0xFF;
+     bytes[1] = (temp >> 8) & 0xFF;
+     bytes[2] = (temp >> 16) & 0xFF;
+     bytes[3] = (temp >> 24) & 0xFF;
+     sprintf(str,"%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
+     *fout<<str;
+     *fout<<",";
+
+}
+
+void PcapFileParser :: writeIPAddressToCSVFile(fstream *fout,ipV6Address ip)
+{
+    char str[8];
+
+    for(int iteratingIndex = 0; iteratingIndex < 8; iteratingIndex++)
+    {
+        uint16 twoBytes = ntohs(ip.ipV6[iteratingIndex]);
+        sprintf(str,"%x.",twoBytes);
+        *fout<<str;
+    }
+    *fout<<",";
+
 }
 
 #endif // PCAP_FILE_PARSER_H
