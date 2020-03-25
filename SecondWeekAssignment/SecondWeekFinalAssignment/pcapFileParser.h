@@ -19,11 +19,7 @@ class PcapFileParser
 
     void writePacketDetailsToCSVFile();
 
-    void writeIPAddressCountToCSVFile();
-
-    void writeIPAddressToCSVFile(fstream* fout,ipV4Address ip);
-
-    void writeIPAddressToCSVFile(fstream* fout,ipV6Address ip);
+    void writeIPAddressCountToCSVFile(char fileName[], map<ipV4Address,int> mymap1, map<ipV6Address,int> mymap2);
 
 };
 
@@ -405,60 +401,8 @@ PcapFile PcapFileParser:: parse(char fileName[])
             // closing the file
             fout.close();
 
-            //now opening second csv file
-
-            fout.open(generateSecondCSVFileName(fileName), ios::out | ios::app);
-
-            fout<<"Ip Address";
-            fout<<",";
-            fout<<"Packet Counts";
-
-            //Now writing ipV4 addressed to second csv file first
-
-            printf("\nMAP1 **************\n");
-            for (auto x : mymap1)
-                //cout << x.first.ip << " " << x.second << endl;
-                //printf("\n%d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d . %d  -- %d",x.first.ip[0],x.first.ip[1],x.first.ip[2],x.first.ip[3],x.first.ip[4],x.first.ip[5],x.first.ip[6],x.first.ip[7],x.first.ip[8],x.first.ip[9],x.first.ip[10],x.first.ip[11],x.first.ip[12],x.first.ip[13],x.first.ip[14],x.first.ip[15],x.second);
-                {
-                    fout<<"\n";
-                    //x.first.writeIPAddressToCSVFile(&fout);
-                    writeIPAddressToCSVFile(&fout,x.first);
-                    fout<<x.second;
-                    printIPAddress(ntohl(x.first.ipV4));
-                    printf(" -- %d\n",x.second);
-                }
-            /*map<ipV4Address, int>::iterator itr;
-            for(itr=mymap1.begin();itr!=mymap1.end();itr++)
-            {
-                fout<<"\n";
-                ipV4Address* abc;
-                *abc =(itr->first);
-                abc->writeIPAddressToCSVFile(&fout);
-                fout<<",";
-                fout<<itr->second;
-            }*/
-            printf("\nMAP2 **************\n");
-            for(auto x: mymap2)
-            {
-                fout<<"\n";
-                //ipV6Address* abc;
-                //*abc = x.first;
-                //abc->writeIPAddressToCSVFile(&fout);
-                writeIPAddressToCSVFile(&fout,x.first);
-                fout<<x.second;
-                printIPAddress(x.first);
-                printf(" -- %d\n",x.second);
-            }
-            /*map<ipV6Address, int>::iterator it;
-            for(it=mymap2.begin();it!=mymap2.end();it++)
-            {
-                fout<<"\n";
-                ipV6Address* abc;
-                *abc =(it->first);
-                abc->writeIPAddressToCSVFile(&fout);
-                fout<<",";
-                fout<<it->second;
-            }*/
+            // writing ipAddresses Count to second csv file
+            writeIPAddressCountToCSVFile(fileName,mymap1,mymap2);
 
        }
        else  // file is not pcap type
@@ -503,32 +447,40 @@ char* PcapFileParser :: generateSecondCSVFileName(char fileName[])
     return fileName;
 }
 
-void PcapFileParser :: writeIPAddressToCSVFile(fstream *fout,ipV4Address ip)
+void PcapFileParser :: writeIPAddressCountToCSVFile(char fileName[],map <ipV4Address,int> mymap1, map<ipV6Address,int> mymap2)
 {
-     char str[8];
-     unsigned int temp = ntohl(ip.ipV4);
-     unsigned char bytes[4];
-     bytes[0] = temp & 0xFF;
-     bytes[1] = (temp >> 8) & 0xFF;
-     bytes[2] = (temp >> 16) & 0xFF;
-     bytes[3] = (temp >> 24) & 0xFF;
-     sprintf(str,"%d.%d.%d.%d", bytes[3], bytes[2], bytes[1], bytes[0]);
-     *fout<<str;
-     *fout<<",";
+    fstream fout;
+    //now opening second csv file
+    fout.open(generateSecondCSVFileName(fileName), ios::out | ios::app);
 
-}
+    fout<<"Ip Address";
+    fout<<",";
+    fout<<"Packet Counts";
 
-void PcapFileParser :: writeIPAddressToCSVFile(fstream *fout,ipV6Address ip)
-{
-    char str[8];
+    //Now writing ipV4 addressed to second csv file first
 
-    for(int iteratingIndex = 0; iteratingIndex < 8; iteratingIndex++)
+    printf("\nMAP1 **************\n");
+    for (auto x : mymap1)
     {
-        uint16 twoBytes = ntohs(ip.ipV6[iteratingIndex]);
-        sprintf(str,"%x.",twoBytes);
-        *fout<<str;
+        fout<<"\n";
+        ipV4Address ip = x.first;
+        ip.writeIPAddressToCSVFile(&fout);
+        fout<<x.second;
+        printIPAddress(ntohl(x.first.ipV4));
+        printf(" --> %d\n",x.second);
     }
-    *fout<<",";
+
+    printf("\nMAP2 **************\n");
+    for(auto x: mymap2)
+    {
+        fout<<"\n";
+        ipV6Address ip = x.first;
+        ip.writeIPAddressToCSVFile(&fout);
+        fout<<x.second;
+        printIPAddress(x.first);
+        printf(" -- %d\n",x.second);
+    }
+    fout.close();
 
 }
 
