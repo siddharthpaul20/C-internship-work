@@ -251,9 +251,129 @@ PcapFile PcapFileParser:: parse(char fileName[])
                 }
                 else
                 {
-                    unsigned int tempPacketLength = hexadecimalToDecimal(displayInHex(pobj.captureLength));
-                    inFile.seekg(skipPacketPointer+tempPacketLength,ios::beg);
-                    readerPointer=skipPacketPointer+tempPacketLength;
+                    // check if the packet is of type ipV6
+                    if(eobj.ethernetType==56710)
+                    {
+                        // packet is of type ipV6
+                        // increment ipV6 packet count
+                        pcapFileObject.incrementIpv6PacketCount();
+
+                        ipV6Header i6obj;
+
+                        inFile.read((char*) &i6obj.versionNdTrafficClassNdFlowLabel,4);
+                        readerPointer+=4;
+
+                        inFile.read((char*) &i6obj.payloadLength,2);
+                        readerPointer+=2;
+
+                        inFile.read((char*) &i6obj.nextHeaderNdHopLimit,2);
+                        readerPointer+=2;
+
+                        inFile.read((char*) &i6obj.sourceAddress,16);
+                        readerPointer+=16;
+
+                        inFile.read((char*) &i6obj.destinationAddress,16);
+                        readerPointer+=16;
+
+                        i6obj.displayIPV6HeaderInHexaDecimal();
+
+                        i6obj.displayIPV6Header();
+
+                        //****************************
+                        i6obj.writeIPAddressToCSVFile(&fout);
+                        fout<<",";
+                        //**************** IPV4 header read successfully **********************************
+
+                        // Now reading tcp header or udp header
+                        if(i6obj.nextHeaderNdHopLimit&0xFF==6)
+                        //if(hexadecimalToDecimal(displayInHex(i6obj.nextHeaderNdHopLimit))==6)
+                        {
+                            // Reading TCP Header
+                            // Now reading tcp Header
+                            // increment tcpPacketCount first
+                            pcapFileObject.incrementTcpPacketCount();
+
+                            tcpHeader tcpHobj;
+
+                            inFile.read((char*) &tcpHobj.sourcePortNumber,2);
+                            readerPointer+=2;
+
+                            tcpHobj.destinationPortNumber = 0;
+                            inFile.read((char*) &tcpHobj.destinationPortNumber,2);
+                            readerPointer+=2;
+
+                            inFile.read((char*) &tcpHobj.sequenceNumber,4);
+                            readerPointer+=4;
+
+                            inFile.read((char*) &tcpHobj.acknowlegementNumber,4);
+                            readerPointer+=4;
+
+                            inFile.read((char*) &tcpHobj.hLenNdReservedBitsNdControlFlags,2);
+                            readerPointer+=2;
+
+                            inFile.read((char*) &tcpHobj.windowSize,2);
+                            readerPointer+=2;
+
+                            inFile.read((char*) &tcpHobj.checkSum,2);
+                            readerPointer+=2;
+
+                            inFile.read((char*) &tcpHobj.urgentPointer,2);
+                            readerPointer+=2;
+
+                            tcpHobj.displayTcpHeaderInHexaDecimal();
+
+                            tcpHobj.displayTcpHeader();
+
+                            tcpHobj.writePortNumberToCSVFile(&fout);
+                            fout<<",";
+                        }
+                        else
+                        {
+                            if(i6obj.nextHeaderNdHopLimit&0xFF==17)
+                            //if(hexadecimalToDecimal(displayInHex(i4obj.protocol))==17)
+                            {
+                                // Reading UDP Header
+                                // increment udp header first
+                                pcapFileObject.incrementUdpPacketCount();
+
+                                udpHeader udpHobj;
+
+                                inFile.read((char*) &udpHobj.sourcePortNumber,2);
+                                readerPointer+=2;
+
+                                inFile.read((char*) &udpHobj.destinationPortNumber,2);
+                                readerPointer+=2;
+
+                                inFile.read((char*) &udpHobj.length,2);
+                                readerPointer+=2;
+
+                                inFile.read((char*) &udpHobj.checkSum,2);
+                                readerPointer+=2;
+
+                                udpHobj.displayUdpHeaderInHexaDecimal();
+                                udpHobj.displayUdpHeader();
+
+                                udpHobj.writePortNumberToCSVFile(&fout);
+                                fout<<",";
+                            }
+                        }
+
+                        // at last when tcp or udp header is read
+                        unsigned int tempPacketLength = hexadecimalToDecimal(displayInHex(pobj.captureLength));
+                        cout<<"\n-----------------> "<<tempPacketLength<<"\n";
+                        readerPointer=skipPacketPointer+tempPacketLength;
+                        cout<<"\n-----------------> "<<readerPointer<<"\n";
+                        inFile.seekg(readerPointer,ios::beg);
+                        //*************************************
+                    }
+                    else
+                    {
+                        // packet is neither of ipV4 nor ipV6
+                        // just skip this packet
+                        unsigned int tempPacketLength = hexadecimalToDecimal(displayInHex(pobj.captureLength));
+                        inFile.seekg(skipPacketPointer+tempPacketLength,ios::beg);
+                        readerPointer=skipPacketPointer+tempPacketLength;
+                    }
                 }
             }  // end of while
 

@@ -33,6 +33,7 @@ struct ipV6Header
 
     void displayIPV6HeaderInHexaDecimal()
     {
+        printf("\nipV6 Header in HexaDecimal ************************");
         printf("\nipV6 Header Version, Traffic Class, and FlowLabel : 0x%x",versionNdTrafficClassNdFlowLabel);
         printf("\nipV6 Header Payload Length : 0x%x",payloadLength);
         printf("\nipV6 NextHeader and HopLimit : 0x%x",nextHeaderNdHopLimit);
@@ -42,6 +43,7 @@ struct ipV6Header
 
     void displayIPV6Header()
     {
+        printf("\nipV6 Header in Decimal ************************");
         printf("\nipV6 Header Version, Traffic Class, and FlowLabel in Decimal : %d",versionNdTrafficClassNdFlowLabel);
         printf("\nipV6 Header Payload Length in Decimal : %d",ntohs(payloadLength));
         printf("\nipV6 NextHeader and HopLimit in Decimal : %d",ntohs(nextHeaderNdHopLimit));
@@ -49,6 +51,27 @@ struct ipV6Header
         printIPAddress(sourceAddress);
         printf("\nipV6 Destination IP address in Decimal : ");
         printIPAddress(destinationAddress);
+    }
 
+    void writeIPAddressToCSVFile(fstream *fout)
+    {
+        char str[8];
+        // for sourceAddress
+        for(int iteratingIndex = 0; iteratingIndex < 8; iteratingIndex++)
+        {
+            uint16 twoBytes = ntohs(sourceAddress.ipV6[iteratingIndex]);
+            sprintf(str,"%x.",twoBytes);
+            *fout<<str;
+        }
+        *fout<<",";
+        // for destinationAddress
+        for(int iteratingIndex = 0; iteratingIndex < 8; iteratingIndex++)
+        {
+            uint16 twoBytes = ntohs(destinationAddress.ipV6[iteratingIndex]);
+            sprintf(str,"%x.",twoBytes);
+            *fout<<str;
+        }
     }
 };
+
+#endif // IPV6HEADER_H
