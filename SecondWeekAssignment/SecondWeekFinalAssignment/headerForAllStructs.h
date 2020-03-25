@@ -9,6 +9,7 @@
 #include "ipv6Header.h"
 #include "tcpHeader.h"
 #include "udpHeader.h"
+#include "ipAddressStoreHeader.h"
 
 #endif
 

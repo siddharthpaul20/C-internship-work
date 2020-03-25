@@ -47,6 +47,8 @@ struct ipV6Header
         printf("\nipV6 Header Version, Traffic Class, and FlowLabel in Decimal : %d",versionNdTrafficClassNdFlowLabel);
         printf("\nipV6 Header Payload Length in Decimal : %d",ntohs(payloadLength));
         printf("\nipV6 NextHeader and HopLimit in Decimal : %d",ntohs(nextHeaderNdHopLimit));
+        printf("\nipV6 NextHeader in Decimal : %d",(ntohs(nextHeaderNdHopLimit)>>8) );
+        printf("\nipV6 HopLimit in Decimal : %d",(ntohs(nextHeaderNdHopLimit) & 255));
         printf("\nipV6 Source IP address in Decimal : ");
         printIPAddress(sourceAddress);
         printf("\nipV6 Destination IP address in Decimal : ");

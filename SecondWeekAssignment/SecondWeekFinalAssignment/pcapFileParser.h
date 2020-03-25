@@ -285,7 +285,7 @@ PcapFile PcapFileParser:: parse(char fileName[])
                         //**************** IPV4 header read successfully **********************************
 
                         // Now reading tcp header or udp header
-                        if(i6obj.nextHeaderNdHopLimit&0xFF==6)
+                        if(i6obj.nextHeaderNdHopLimit&255==6)
                         //if(hexadecimalToDecimal(displayInHex(i6obj.nextHeaderNdHopLimit))==6)
                         {
                             // Reading TCP Header
@@ -329,7 +329,7 @@ PcapFile PcapFileParser:: parse(char fileName[])
                         }
                         else
                         {
-                            if(i6obj.nextHeaderNdHopLimit&0xFF==17)
+                            if(i6obj.nextHeaderNdHopLimit&255==17)
                             //if(hexadecimalToDecimal(displayInHex(i4obj.protocol))==17)
                             {
                                 // Reading UDP Header
