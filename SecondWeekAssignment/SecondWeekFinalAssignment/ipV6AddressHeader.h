@@ -37,6 +37,18 @@ struct ipV6Address
 
     }
 
+    bool operator==(const ipV6Address &other) const
+    {
+        return (   this->ipV6[0] == other.ipV6[0]
+                && this->ipV6[1] == other.ipV6[1]
+                && this->ipV6[2] == other.ipV6[2]
+                && this->ipV6[3] == other.ipV6[3]
+                && this->ipV6[4] == other.ipV6[4]
+                && this->ipV6[5] == other.ipV6[5]
+                && this->ipV6[6] == other.ipV6[6]
+                && this->ipV6[7] == other.ipV6[7]);
+    }
+
     bool operator<(const ipV6Address& ipAddr) const
     {
          if(this->ipV6[0] < ipAddr.ipV6[0])

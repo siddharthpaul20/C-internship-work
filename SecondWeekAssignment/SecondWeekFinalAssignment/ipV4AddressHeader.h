@@ -11,6 +11,11 @@ struct ipV4Address
        ipV4 = 0;
    }
 
+   bool operator==(const ipV4Address &other) const
+   {
+       return ( this->ipV4 == other.ipV4 );
+   }
+
    bool operator<(const ipV4Address& ipAddr) const
    {
         if(this->ipV4 < ipAddr.ipV4)

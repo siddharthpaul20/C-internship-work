@@ -11,6 +11,8 @@
 #include "udpHeader.h"
 #include "ipV4AddressHeader.h"
 #include "ipV6AddressHeader.h"
+#include "ipV4KeyHasherHeader.h"
+#include "ipV6KeyHasherHeader.h"
 
 //#include "ipAddressPair.h"
 

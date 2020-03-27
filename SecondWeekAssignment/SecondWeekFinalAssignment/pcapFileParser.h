@@ -2,7 +2,7 @@
 #define PCAP_FILE_PARSER_H
 
 #include <fstream>
-#include <map>
+#include <unordered_map>
 #include "headerForAllStructs.h"
 #include "pcapFile.h"
 #include "allTypeDefHeader.h"
@@ -19,7 +19,7 @@ class PcapFileParser
 
     void writePacketDetailsToCSVFile();
 
-    void writeIPAddressCountToCSVFile(char fileName[], map<ipV4Address,int> mymap1, map<ipV6Address,int> mymap2);
+    void writeIPAddressCountToCSVFile(char fileName[], unordered_map<ipV4Address,int> mymap1, unordered_map<ipV6Address,int> mymap2);
 
 };
 
@@ -67,8 +67,8 @@ PcapFile PcapFileParser:: parse(char fileName[])
             fstream fout;
 
             // creating a map of type <ipAddress,int> for storing ip address and their count
-            map <ipV4Address,int> mymap1;
-            map <ipV6Address,int> mymap2;
+            unordered_map <ipV4Address,int> mymap1;
+            unordered_map <ipV6Address,int> mymap2;
             // opens an existing csv file or creates a new file.
             fout.open(generateCSVFileName(fileName), ios::out | ios::app);
 
@@ -447,7 +447,7 @@ char* PcapFileParser :: generateSecondCSVFileName(char fileName[])
     return fileName;
 }
 
-void PcapFileParser :: writeIPAddressCountToCSVFile(char fileName[],map <ipV4Address,int> mymap1, map<ipV6Address,int> mymap2)
+void PcapFileParser :: writeIPAddressCountToCSVFile(char fileName[],unordered_map <ipV4Address,int> mymap1, unordered_map<ipV6Address,int> mymap2)
 {
     fstream fout;
     //now opening second csv file
@@ -457,28 +457,23 @@ void PcapFileParser :: writeIPAddressCountToCSVFile(char fileName[],map <ipV4Add
     fout<<",";
     fout<<"Packet Counts";
 
-    //Now writing ipV4 addressed to second csv file first
+    //Now writing ipV4 addresses to second csv file first
 
-    printf("\nMAP1 **************\n");
     for (auto x : mymap1)
     {
         fout<<"\n";
         ipV4Address ip = x.first;
         ip.writeIPAddressToCSVFile(&fout);
         fout<<x.second;
-        printIPAddress(ntohl(x.first.ipV4));
-        printf(" --> %d\n",x.second);
     }
+    //Now writing ipV6 addresses to second csv file now
 
-    printf("\nMAP2 **************\n");
     for(auto x: mymap2)
     {
         fout<<"\n";
         ipV6Address ip = x.first;
         ip.writeIPAddressToCSVFile(&fout);
         fout<<x.second;
-        printIPAddress(x.first);
-        printf(" -- %d\n",x.second);
     }
     fout.close();
 
