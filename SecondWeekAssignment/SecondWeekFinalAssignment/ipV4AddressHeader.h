@@ -6,7 +6,7 @@ struct ipV4Address
 {
    unsigned int ipV4;
 
-   ipAddress()
+   ipV4Address()
    {
        ipV4 = 0;
    }
@@ -26,7 +26,7 @@ struct ipV4Address
 
    void writeIPAddressToCSVFile(fstream *fout)
     {
-        char str[8];
+        char str[9];
 	    unsigned int temp = ntohl(ipV4);
 	    unsigned char bytes[4];
         bytes[0] = temp & 0xFF;

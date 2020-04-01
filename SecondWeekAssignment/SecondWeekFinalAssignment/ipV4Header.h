@@ -72,7 +72,7 @@ struct ipv4Header
 		cout<< "ipV4 header Version and Header length : 0x" <<displayInHex(ipVersionNumberNdHeaderLength);
 		cout<<"\nipV4 header Version in Decimal: "<<((ipVersionNumberNdHeaderLength & 240)>>4);
 		cout<<"\nipV4 header Length in Decimal: "<<(ipVersionNumberNdHeaderLength & 15);
-		cout<< "\nipV4 header Type of service in Decimal: " << ntohs(TOS);
+		cout<<"\nipV4 header Type of service in Decimal: " << ntohs(TOS);
 		cout<<"\nipV4 header Total Length in decimal : "<<ntohs(totalLength);
 		cout<<"\nipV4 header identification in decimal : "<<ntohs(identification);
 		cout<<"\nipV4 header flags in decimal : "<<( ( flagsNdFragmentOffset & 61440 ) >> 12 );
@@ -88,7 +88,7 @@ struct ipv4Header
 
 	void writeIPAddressToCSVFile(fstream* fout)
 	{
-	    char str[8];
+	    char str[9];
 	    unsigned int ip = ntohl(sourceAddress.ipV4);
 	    unsigned char bytes[4];
         bytes[0] = ip & 0xFF;

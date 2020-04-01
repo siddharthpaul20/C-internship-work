@@ -2,6 +2,7 @@
 #define PCAP_FILE_PARSER_H
 
 #include <fstream>
+#include <cstring>
 #include <unordered_map>
 #include "headerForAllStructs.h"
 #include "pcapFile.h"
