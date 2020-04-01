@@ -39,17 +39,14 @@ public :
         return root;
     }
     bool insertIntoTree(int element);           // method to insert a new element in the BST.
-    int deleteElementFromBST(int element);      // method to delete an element from the BST.
     void startInorderTraversal();               // method to start and print inorder traversal of BST.
     void inorderTraversal(node*);               // method to carry out inorder traversal of BST.
     void startPreOrderTraversal();              // method to start and print preorder traversal of BST.
     void preorderTraversal(node*);              // method to carry out preorder traversal of BST.
     void startPostOrderTraversal();             // method to start and print postorder traversal of BST.
     void postorderTraversal(node*);             // method to carry out postorder traversal of BST.
-    int minElementFromRight(node*);             // method to find out minimum element from right subtree of current node.
-    int maxElementFromLeft(node*);              // method to find out maximum element from left subtree of current node.
-    node* deletion(node *root,int x);
-    node* FindMIN(node *root);
+    node* deleteElementFromBST(node *root,int x);      // method to delete an element from the BST.
+    node* FindMinElementFromRightSubtree(node *root);      // method to find out minimum element from right subtree of current node.
 };
 
 bool BST::insertIntoTree(int element)           // method to insert a new element in the BST.
@@ -137,91 +134,6 @@ bool BST::insertIntoTree(int element)           // method to insert a new elemen
     return true;
 }   // end of insertIntoTree() method
 
-int BST :: deleteElementFromBST(int element)
-{
-    // first checking whether the root element is pointing to null pointer
-    if(root == nullptr)
-    {
-        printf("\nBinary Search Tree is empty. Cannot delete element.");
-        return INT_MIN;
-    }
-    // proceding from here when root do not point to null pointer.
-    node *parentNode;
-    node *currentNode;
-    currentNode = root;
-    parentNode = currentNode;
-    while(currentNode!=nullptr)
-    {
-        if(currentNode->data == element)
-        {
-            // delete this node
-            if(currentNode->left==nullptr&&currentNode->right==nullptr)
-            {
-                int tempVariableToReturnValue = currentNode->data;
-                //currentNode = nullptr;
-                delete currentNode;
-                currentNode = nullptr;
-                printf("\nDeleting --> %d from the BST.",tempVariableToReturnValue);
-                return tempVariableToReturnValue;
-            }
-            if(currentNode->left!=nullptr&&currentNode->right==nullptr)
-            {
-                int tempVariableToReturnValue = currentNode->data;
-                node *tempVariableToStoreCurrentNode = currentNode;
-                currentNode = currentNode->left;
-                delete tempVariableToStoreCurrentNode;
-                return tempVariableToReturnValue;
-            }
-            if(currentNode->left==nullptr&&currentNode->right!=nullptr)
-            {
-                int tempVariableToReturnValue = currentNode->data;
-                node *tempVariableToStoreCurrentNode = currentNode;
-                currentNode = currentNode->right;
-                delete tempVariableToStoreCurrentNode;
-               return tempVariableToReturnValue;
-            }
-            // when both child exists
-            if(currentNode->left!=nullptr&&currentNode->right!=nullptr)
-            {
-                int tempVariableToReturnValue = currentNode->data;
-               // find minimum element from right child tree
-               int minElementFromRightValue = minElementFromRight(currentNode->right);   // finding minimum element from right subtree of root
-               deleteElementFromBST(minElementFromRightValue);   // then first delete the minimum element at right subtree of root
-               currentNode->data = minElementFromRightValue;   //replace the value at array[parent] with minimum element from right subtree of root,in otherword deleting array[parent]
-               return tempVariableToReturnValue;
-            }
-        }
-        else
-        {
-            if(currentNode->data > element)
-            {
-                if(currentNode->left!=nullptr)
-                {
-                    //parentNode = currentNode;
-                    //if(parentNode->left->data==element)
-                        //parentNode->left = nullptr;
-                    currentNode= currentNode->left;
-                }
-                else
-                    break;
-            }
-            else
-            {
-                if(currentNode->right!=nullptr)
-                {
-                    //parentNode = currentNode;
-                    //if(parentNode->right->data==element)
-                        //parentNode->right = nullptr;
-                    currentNode= currentNode->right;
-                }
-                else
-                    break;
-            }
-        }
-    }
-    return INT_MIN;
-}
-
 
 void BST :: startInorderTraversal()         // method to start and print inorder traversal of BST.
 {
@@ -239,9 +151,11 @@ void BST :: inorderTraversal(node *currentNode)     // method to carry out inord
     else
     {
         // currentNode is not equal to nullptr
-        inorderTraversal(currentNode->left);
+        if( currentNode->left != nullptr)
+            inorderTraversal(currentNode->left);
         printf("%d ",currentNode->data);
-        inorderTraversal(currentNode->right);
+        if( currentNode->right != nullptr)
+            inorderTraversal(currentNode->right);
     }
     return;
 }
@@ -293,76 +207,121 @@ void BST :: postorderTraversal(node *currentNode)     // method to carry out Pos
 }
 
 
-int BST :: minElementFromRight(node *parentNode)             // method to find out minimum element from right subtree of current node.
+node* BST :: deleteElementFromBST(node *currentNode,int element)    // method to delete an element from the BST.
 {
-    node *currentNode;
-    currentNode = parentNode;
-    while(currentNode->left!=nullptr)      // loop untill the left most child of parentNode is reached.
-        currentNode = currentNode->left;
-    return currentNode->data;               // return value of left most child of parentNode.
-}
-
-int BST :: maxElementFromLeft(node *parentNode)              // method to find out maximum element from left subtree of current node.
-{
-    node *currentNode;
-    currentNode = parentNode;
-    while(currentNode->right!=nullptr)      // loop untill the right most child of parentNode is reached.
-        currentNode = currentNode->right;
-    return currentNode->data;               // return value of right most child of parentNode.
-}
-
-
-node* BST::deletion(node *root,int x)
-{
-    if(root==nullptr)
+    // check if currentNode is pointing to nullptr or not
+    if(currentNode==nullptr)
     {
-        std::cout<<"\nBinary Search Tree is Empty.";
+        // CurrentNode is pointing to null pointer.
+        printf("\nBinary Search Tree is Empty.");
         return root;
     }
     else
     {
-       if(root->data>x)
-        root->left=deletion(root->left,x);
+        // root node is not empty
+       if( currentNode->data > element )       // if data of currentNode is greater than element value
+        currentNode->left= deleteElementFromBST(currentNode->left, element);    // move currentNode to its left child
        else
        {
-           if(root->data<x)
-            root->right=deletion(root->right,x);
+           if( currentNode->data < element )       // if data of currentNode is less than element value
+            currentNode->right= deleteElementFromBST( currentNode->right, element);    // move currentNode to its right child
            else
-           { //ELEMENT MATCHED
-               if(root->left==nullptr&&root->right==nullptr)
+           { //ELEMENT MATCHED, that is, currentNode->data = element true
+
+               if(currentNode == root )     // checking if the currentNode to be deleted is root node or not
                {
-                   delete root;
-                   root=nullptr;
-                   std::cout<<"\n"<<x<<" was DELETED SUCCESSFULLY.";
-                   return root;
-               }
-               if(root->left!=nullptr&&root->right==nullptr)
-               {
-                   node *temp=root;
-                   root=root->left;
-                   delete temp;
-                   std::cout<<"\n"<<x<<" was DELETED SUCCESSFULLY.";
-                   return root;
+                   // currentNode is root node
+                   if( root->left==nullptr && root->right==nullptr )
+                   {
+                       // when both the child of the currentNode do not exist
+                       delete root;      // deleting the node pointed by currentNode, and freeing up the space.
+                       root=nullptr;     // assigning null pointer to currentNode
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       return currentNode;
+                   }
+
+                   if( currentNode->left!=nullptr && currentNode->right==nullptr )
+                   {
+                       // when left child exists and right child do not exists.
+                       node *temporaryNode= currentNode;        // temporaryNode to store address of currentNode
+                       currentNode= currentNode->left;          // make currentNode jump to its left child.
+                       delete temporaryNode;            // Deleting the earlier currentNode and freeing up its space.
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       root = currentNode;      // updating root node
+                       return currentNode;
+                   }
+
+                   if( currentNode->left==nullptr && currentNode->right!=nullptr )
+                   {
+                       // when right child exists and left child do not exists.
+                       node *temporaryNode= currentNode;        // temporaryNode to store address of currentNode
+                       currentNode= currentNode->right;          // make currentNode jump to its right child.
+                       delete temporaryNode;            // Deleting the earlier currentNode and freeing up its space.
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       root = currentNode;      // updating root node
+                       return currentNode;
+                   }
+                   else
+                   {  //BOTH THE CHILEDS EXISTS
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       node *temp;      // temporary node containing the node which is having minimum element from right subtree of currentNode
+                       temp= FindMinElementFromRightSubtree(currentNode->right);    // finding and assigning minimum element from right subtree.
+                       currentNode->data= temp->data;       // assigning minimum element value from right subtree to currentNode data.
+                       currentNode->right= deleteElementFromBST( currentNode->right,temp->data);
+
+                   }  //BOTH THE CHILDS EXISTS
                }
                else
-               {  //BOTH THE CHILEDS EXISTS
-                   std::cout<<"\n"<<x<<" was DELETED SUCCESSFULLY.";
-                   node *temp;
-                   temp=FindMIN(root->right);
-                   root->data=temp->data;
-                   root->right=deletion(root->right,temp->data);
+               {
+                   if( currentNode->left==nullptr && currentNode->right==nullptr )
+                   {
+                       // when both the child of the currentNode do not exist
+                       delete currentNode;      // deleting the node pointed by currentNode, and freeing up the space.
+                       currentNode=nullptr;     // assigning null pointer to currentNode
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       return currentNode;
+                   }
 
-               }  //BOTH THE CHILDS EXISTS
+                   if( currentNode->left!=nullptr && currentNode->right==nullptr )
+                   {
+                       // when left child exists and right child do not exists.
+                       node *temporaryNode= currentNode;        // temporaryNode to store address of currentNode
+                       currentNode= currentNode->left;          // make currentNode jump to its left child.
+                       delete temporaryNode;            // Deleting the earlier currentNode and freeing up its space.
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       return currentNode;
+                   }
+
+                   if( currentNode->left==nullptr && currentNode->right!=nullptr )
+                   {
+                       // when right child exists and left child do not exists.
+                       node *temporaryNode= currentNode;        // temporaryNode to store address of currentNode
+                       currentNode= currentNode->right;          // make currentNode jump to its right child.
+                       delete temporaryNode;            // Deleting the earlier currentNode and freeing up its space.
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       return currentNode;
+                   }
+                   else
+                   {  //BOTH THE CHILEDS EXISTS
+                       printf("\n%d was DELETED SUCCESSFULLY.",element);
+                       node *temp;      // temporary node containing the node which is having minimum element from right subtree of currentNode
+                       temp= FindMinElementFromRightSubtree(currentNode->right);    // finding and assigning minimum element from right subtree.
+                       currentNode->data= temp->data;       // assigning minimum element value from right subtree to currentNode data.
+                       currentNode->right= deleteElementFromBST( currentNode->right,temp->data);
+
+                   }  //BOTH THE CHILDS EXISTS
+               }
+
            } //ELEMENT MATCHED
        }
     }
 }
-node* BST::FindMIN(node *root)
+node* BST :: FindMinElementFromRightSubtree(node *parentNode)      // method to find out minimum element from right subtree of current node.
 {
-    node *t=root;
-    while(t->left!=nullptr)
-        t=t->left;
-    return (t);
+    node *currentNode = parentNode;     // currentNode variable is used for traverse the BST from parentNode to reach its leftmost child
+    while( currentNode->left != nullptr )
+        currentNode = currentNode->left;       // update currentNode to point its left child when it is non-empty.
+    return (currentNode);       // returning the leftmost child of parentNode.
 }
 
 

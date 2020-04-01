@@ -2,7 +2,7 @@
 // This program takes input elements and insert it into the Binary Search tree, and provides user with the functionality of inorder,preorder,postorder traversal
 // and insertion and deletion of elements option to the user.
 // In this program BST is implemented with the help of linked list.
-
+// This program is tested on many testcases.
 // This program has limitation that, when elements are inserted in increasing order,
 // than the BST grows in one direction only, causing time complexity of search operation O(n).
 //***************************************************************************************************************************************************************
@@ -112,9 +112,8 @@ int main()
         case deleteElementFromBST:
             printf("\nEnter the element to delete from the binary search tree = ");
             scanf("%d",&element);
-            object.
 
-            deletion(object.getRoot(),element);
+            object.deleteElementFromBST(object.getRoot(),element);
             /*
             if(object.deleteElementFromBST(element) == INT_MIN)     // deleting the entered element from BST, if it is present in the BST
                 printf("\n%d element is not present in the binary search tree.",element);   // element is not present in the BST.
